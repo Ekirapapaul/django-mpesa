@@ -25,13 +25,13 @@ class SubmitView(APIView):
         data = request.data
         phone_number = data['phone_number']
         amount = data['amount']
-        orderId = data['order_id']
+        entity_id = data['entity_id']
 
         print(phone_number)
         print(amount)
-        sendSTK(phone_number, amount, orderId)
+        transactionId = sendSTK(phone_number, amount, entity_id)
         # b2c()
-        message = {"status": "ok"}
+        message = {"status": "ok" , "transaction_id" : transactionId}
         return Response(message, status=HTTP_200_OK)
 
 
