@@ -6,7 +6,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import View
 from .functions import sendSTK
-from rest_framework.views import APIView, ListCreateAPIView
+from rest_framework.views import APIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
 from .models import PaymentTransaction
