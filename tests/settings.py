@@ -25,7 +25,7 @@ SECRET_KEY = '2nm=k(8_j4aetkgfok7i-dp&^lh)3-n)qhy5-6h4*foejbg^5h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
