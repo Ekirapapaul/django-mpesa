@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 
+
 # Create your models here.
 # Creating base models for other models to inherit from
 class BaseModel(models.Model):

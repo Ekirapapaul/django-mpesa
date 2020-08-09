@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
-from .commons.models import BaseModel
+from mpesa.commons.models import BaseModel
+
 
 # Create your models here.
 class PaymentTransaction(models.Model):
