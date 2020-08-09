@@ -28,8 +28,6 @@ class SubmitView(APIView):
         amount = data['amount']
         entity_id = data['entity_id']
 
-        print(phone_number)
-        print(amount)
         transactionId = sendSTK(phone_number, amount, entity_id)
         # b2c()
         message = {"status": "ok" , "transaction_id" : transactionId}
@@ -101,19 +99,22 @@ class ConfirmView(APIView):
 
     def post(self, request):
         # save the data
-        print("confirm view reached")
         request_data = json.dumps(request.data)
         request_data = json.loads(request_data)
         body = request_data.get('Body')
-        print("Body " + json.dumps(body))
         resultcode = body.get('stkCallback').get('ResultCode')
         # Perform your processing here e.g. print it out...
         if resultcode == 0:
             print('Payment successful')
             requestId = body.get('stkCallback').get('CheckoutRequestID')
+            metadata = body.get('stkCallback').get('CallbackMetadata').get('Item')
+            for data in metadata:
+                if data.get('Name') == "MpesaReceiptNumber":
+                    receipt_number = data.get('Value')
             transaction = PaymentTransaction.objects.get(
                 checkoutRequestID=requestId)
             if transaction:
+                transaction.trans_id = receipt_number
                 transaction.isFinished = True
                 transaction.isSuccessFull = True
                 transaction.save()

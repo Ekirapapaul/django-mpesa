@@ -25,7 +25,8 @@ api_URL = os.environ.get('API_URL')
 INITIATOR_PASS = os.environ.get('INITIATOR_PASS')
 CERTIFICATE_FILE = os.environ.get('CERTIFICATE_FILE')
 HOST_NAME = os.environ.get('HOST_NAME')
-
+PASS_KEY = os.environ.get('PASS_KEY')
+shortcode = os.environ.get('SHORT_CODE')
 
 def encryptInitiatorPassword():
     PASS = "foobar1234"
@@ -43,17 +44,12 @@ def encryptInitiatorPassword():
 
 def generate_pass_key(cipher):
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
-    PASS_KEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
-    shortcode = "601754"
     s = shortcode + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
 
 def get_token():
     api_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
-
-    consumer_key = "9ntpVdAfDvNqjt6VzFkbNYbOx5wmKonx"
-    consumer_secret = "Bv7Z7IjRNAetpDAr"
 
     r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
     jonresponse = json.loads(r.content)
@@ -84,8 +80,6 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
     access_token = get_token()
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
 
-    PASS_KEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"
-    shortcode = "174379"
     s = shortcode + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
@@ -104,7 +98,7 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
         "PartyA": phone_number,
         "PartyB": shortcode,
         "PhoneNumber": phone_number,
-        "CallBackURL": "{}/api/confirm/".format(HOST_NAME),
+        "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
         "AccountReference": phone_number,
         "TransactionDesc": "Payment for {}".format(phone_number)
     }
