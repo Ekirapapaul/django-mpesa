@@ -12,6 +12,8 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.response import Response
 from .models import PaymentTransaction
 from django.http import JsonResponse
+from rest_framework.permissions import AllowAny
+
 
 # Create your views here.
 
@@ -22,6 +24,8 @@ class PaymentTranactionView(ListCreateAPIView):
 
 
 class SubmitView(APIView):
+    permission_classes = [AllowAny, ]
+
     def post(self, request):
         data = request.data
         phone_number = data['phone_number']
@@ -30,11 +34,12 @@ class SubmitView(APIView):
 
         transactionId = sendSTK(phone_number, amount, entity_id)
         # b2c()
-        message = {"status": "ok" , "transaction_id" : transactionId}
+        message = {"status": "ok", "transaction_id": transactionId}
         return Response(message, status=HTTP_200_OK)
 
 
 class CheckTransaction(APIView):
+    permission_classes = [AllowAny, ]
 
     def post(self, request):
         data = request.data
@@ -47,23 +52,25 @@ class CheckTransaction(APIView):
                     "finished": transaction.isFinished,
                     "successful": transaction.isSuccessFull
                 },
-                                    status=200)
+                    status=200)
             else:
                 # TODO : Edit order if no transaction is found
                 return JsonResponse({
                     "message": "Error. Transaction not found",
                     "status": False
                 },
-                                    status=400)
+                    status=400)
         except PaymentTransaction.DoesNotExist:
             return JsonResponse({
                 "message": "Server Error. Transaction not found",
                 "status": False
             },
-                                status=400)
+                status=400)
 
 
 class RetryTransaction(APIView):
+    permission_classes = [AllowAny, ]
+
     def post(self, request):
         trans_id = request.data['transaction_id']
         try:
@@ -74,7 +81,7 @@ class RetryTransaction(APIView):
                     "finished": transaction.isFinished,
                     "successful": transaction.isSuccessFull
                 },
-                                    status=200)
+                    status=200)
             else:
                 response = sendSTK(
                     phone_number=transaction.phone_number,
@@ -85,17 +92,18 @@ class RetryTransaction(APIView):
                     "message": "ok",
                     "transaction_id": response
                 },
-                                    status=200)
+                    status=200)
 
         except PaymentTransaction.DoesNotExist:
             return JsonResponse({
                 "message": "Error. Transaction not found",
                 "status": False
             },
-                                status=400)
+                status=400)
 
 
 class ConfirmView(APIView):
+    permission_classes = [AllowAny, ]
 
     def post(self, request):
         # save the data
@@ -144,7 +152,9 @@ class ConfirmView(APIView):
     def get(self, request):
         return Response("Confirm callback", status=HTTP_200_OK)
 
+
 class ValidateView(APIView):
+    permission_classes = [AllowAny, ]
 
     def post(self, request):
         # save the data
