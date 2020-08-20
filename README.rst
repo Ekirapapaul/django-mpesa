@@ -36,7 +36,7 @@ Quick start
 6. Visit http://127.0.0.1:8000/mpesa/ to checkout the library features.
 
 API ENDPONTS
------------
+------------
 
 This module exposes some API endpoints that enable you work with MPESA API
 

@@ -25,7 +25,7 @@ class PaymentTransaction(models.Model):
     isFinished = models.BooleanField(default=False)
     isSuccessFull = models.BooleanField(default=False)
     trans_id = models.CharField(max_length=30)
-    order_id = models.CharField(max_length=30)
+    order_id = models.CharField(max_length=200)
     checkoutRequestID = models.CharField(max_length=100)
     date_modified = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now=False, auto_now_add=True)
