@@ -18,7 +18,6 @@ try:
 except ModuleNotFoundError:
     pass
 
-
 consumer_key = os.environ.get('CONSUMER_KEY')
 consumer_secret = os.environ.get('CONSUMER_SECRET')
 api_URL = os.environ.get('API_URL')
@@ -27,6 +26,7 @@ CERTIFICATE_FILE = os.environ.get('CERTIFICATE_FILE')
 HOST_NAME = os.environ.get('HOST_NAME')
 PASS_KEY = os.environ.get('PASS_KEY')
 shortcode = os.environ.get('SHORT_CODE')
+
 
 def encryptInitiatorPassword():
     PASS = "foobar1234"
@@ -73,7 +73,7 @@ def register_url(access_token):
 
     response = requests.post(api_url, json=request, headers=headers)
 
-    print (response.text)
+    print(response.text)
 
 
 def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
@@ -115,7 +115,55 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
             transaction.save()
             return transaction.id
         else:
-            transaction = PaymentTransaction.objects.create(phone_number=phone_number, checkoutRequestID=checkoutId, amount=amount, order_id=orderId)
+            transaction = PaymentTransaction.objects.create(phone_number=phone_number, checkoutRequestID=checkoutId,
+                                                            amount=amount, order_id=orderId)
+            transaction.save()
+            return transaction.id
+    else:
+        raise Exception("Error sending MPesa stk push", json_response)
+
+
+def sendSTK(phone_number, amount, callback_url, orderId=0, transaction_id=None):
+    access_token = get_token()
+    time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
+
+    s = shortcode + PASS_KEY + time_now
+    encoded = b64encode(s.encode('utf-8')).decode('utf-8')
+
+    api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    headers = {
+        "Authorization": "Bearer %s" % access_token,
+        "Content-Type": "application/json",
+    }
+    print("Phonenumber: {}, Amount: {}".format(phone_number, amount))
+    request = {
+        "BusinessShortCode": shortcode,
+        "Password": encoded,
+        "Timestamp": time_now,
+        "TransactionType": "CustomerPayBillOnline",
+        "Amount": str(int(amount)),
+        "PartyA": phone_number,
+        "PartyB": shortcode,
+        "PhoneNumber": phone_number,
+        "CallBackURL": "{}{}".format(HOST_NAME, callback_url),
+        "AccountReference": phone_number,
+        "TransactionDesc": "Payment for {}".format(phone_number)
+    }
+
+    print(json.dumps(request))
+    response = requests.post(api_url, json=request, headers=headers)
+    json_response = json.loads(response.text)
+    print(json_response)
+    if json_response["ResponseCode"] == "0":
+        checkoutId = json_response["CheckoutRequestID"]
+        if transaction_id:
+            transaction = PaymentTransaction.objects.filter(id=transaction_id)
+            transaction.checkoutRequestID = checkoutId
+            transaction.save()
+            return transaction.id
+        else:
+            transaction = PaymentTransaction.objects.create(phone_number=phone_number, checkoutRequestID=checkoutId,
+                                                            amount=amount, order_id=orderId)
             transaction.save()
             return transaction.id
     else:
