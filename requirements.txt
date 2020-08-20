@@ -3,7 +3,7 @@ certifi==2019.11.28
 cffi==1.13.2
 chardet==3.0.4
 cryptography==2.7
-Django==2.2.5
+Django==2.2.13
 django-dotenv==1.4.2
 djangorestframework==3.10.3
 idna==2.8
