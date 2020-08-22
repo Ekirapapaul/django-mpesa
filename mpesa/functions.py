@@ -103,10 +103,8 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
         "TransactionDesc": "Payment for {}".format(phone_number)
     }
 
-    print(json.dumps(request))
     response = requests.post(api_url, json=request, headers=headers)
     json_response = json.loads(response.text)
-    print(json_response)
     if json_response["ResponseCode"] == "0":
         checkoutId = json_response["CheckoutRequestID"]
         if transaction_id:
@@ -119,5 +117,37 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
                                                             amount=amount, order_id=orderId)
             transaction.save()
             return transaction.id
+    else:
+        raise Exception("Error sending MPesa stk push", json_response)
+
+
+def check_payment_status(checkout_request_id):
+    access_token = get_token()
+    time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
+
+    s = shortcode + PASS_KEY + time_now
+    encoded = b64encode(s.encode('utf-8')).decode('utf-8')
+
+    api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
+    headers = {
+        "Authorization": "Bearer %s" % access_token,
+        "Content-Type": "application/json",
+    }
+    request = {
+        "BusinessShortCode": shortcode,
+        "Password": encoded,
+        "Timestamp": time_now,
+        "CheckoutRequestID": checkout_request_id
+    }
+    response = requests.post(api_url, json=request, headers=headers)
+    json_response = json.loads(response.text)
+    if 'ResponseCode' in json_response and json_response["ResponseCode"] == "0":
+        result_code = json_response['ResultCode']
+        response_message = json_response['ResultDesc']
+        return {
+            "result_code": result_code,
+            "status": result_code == "0",
+            "message": response_message
+        }
     else:
         raise Exception("Error sending MPesa stk push", json_response)

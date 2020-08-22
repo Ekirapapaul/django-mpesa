@@ -46,7 +46,7 @@ This module exposes some API endpoints that enable you work with MPESA API
 2. mpesa/confirm/
     This endpoint is used as the callback endpoint on which MPESA will return a transaction response/status
     
-3. mpesa/checktransaction/
+3. mpesa/check-transaction/
     This endpoint allows you to manually check for the status of an mpesa transaction
     
 Check out the `test module <https://github.com/Ekirapapaul/django-mpesa/tree/master/tests>`__ for more elaborate examples

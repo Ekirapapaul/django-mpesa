@@ -5,7 +5,7 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import View
-from .functions import sendSTK
+from .functions import sendSTK, check_payment_status
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -36,6 +36,30 @@ class SubmitView(APIView):
         # b2c()
         message = {"status": "ok", "transaction_id": transactionId}
         return Response(message, status=HTTP_200_OK)
+
+
+class CheckTransactionOnline(APIView):
+    permission_classes = [AllowAny, ]
+
+    def post(self, request):
+        trans_id = request.data['transaction_id']
+        transaction = PaymentTransaction.objects.filter(id=trans_id).get()
+        try:
+            if transaction.checkoutRequestID:
+                status_response = check_payment_status(transaction.checkoutRequestID)
+                return JsonResponse(
+                    status_response, status=400)
+            else:
+                return JsonResponse({
+                    "message": "Server Error. Transaction not found",
+                    "status": False
+                }, status=400)
+        except PaymentTransaction.DoesNotExist:
+            return JsonResponse({
+                "message": "Server Error. Transaction not found",
+                "status": False
+            },
+                status=400)
 
 
 class CheckTransaction(APIView):
