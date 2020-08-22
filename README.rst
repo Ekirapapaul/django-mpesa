@@ -29,7 +29,7 @@ Quick start
 
     path('mpesa/', include(mpesa_urls)),
 
-4. Run `python manage.py makemigrations` and `python manage.py migrate` to create the mpesa models.
+4. Run `python manage.py migrate` to create the mpesa models.
 
 5. Start the development server and visit http://127.0.0.1:8000/admin/
 
