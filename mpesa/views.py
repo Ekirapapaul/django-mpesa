@@ -48,7 +48,7 @@ class CheckTransactionOnline(APIView):
             if transaction.checkoutRequestID:
                 status_response = check_payment_status(transaction.checkoutRequestID)
                 return JsonResponse(
-                    status_response, status=400)
+                    status_response, status=200)
             else:
                 return JsonResponse({
                     "message": "Server Error. Transaction not found",
