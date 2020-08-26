@@ -26,6 +26,7 @@ CERTIFICATE_FILE = os.environ.get('CERTIFICATE_FILE')
 HOST_NAME = os.environ.get('HOST_NAME')
 PASS_KEY = os.environ.get('PASS_KEY')
 shortcode = os.environ.get('SHORT_CODE')
+SAFARICOM_API = os.environ.get('SAFARICOM_API')
 
 
 def encryptInitiatorPassword():
@@ -49,7 +50,7 @@ def generate_pass_key(cipher):
 
 
 def get_token():
-    api_URL = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+    api_URL = "{}/oauth/v1/generate?grant_type=client_credentials".format(SAFARICOM_API)
 
     r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
     jonresponse = json.loads(r.content)
@@ -59,7 +60,7 @@ def get_token():
 
 
 def register_url(access_token):
-    api_url = "http://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"
+    api_url = "{}/mpesa/c2b/v1/registerurl".format(SAFARICOM_API)
     headers = {
         "Authorization": "Bearer %s" % access_token,
         "Content-Type": "application/json",
@@ -83,7 +84,7 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
     s = shortcode + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
-    api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    api_url = "{}/mpesa/stkpush/v1/processrequest".format(SAFARICOM_API)
     headers = {
         "Authorization": "Bearer %s" % access_token,
         "Content-Type": "application/json",
@@ -128,7 +129,7 @@ def check_payment_status(checkout_request_id):
     s = shortcode + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
-    api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
+    api_url = "{}/mpesa/stkpushquery/v1/query".format(SAFARICOM_API)
     headers = {
         "Authorization": "Bearer %s" % access_token,
         "Content-Type": "application/json",

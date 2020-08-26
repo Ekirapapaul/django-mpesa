@@ -1,0 +1,37 @@
+@host =http://localhost:8000
+@phoneNumber=2547XXXXXXXX
+
+
+###
+# @name requestSTKPush
+POST {{host}}/mpesa/submit/ HTTP/1.1
+content-type: application/json
+
+{
+    "phone_number":{{phoneNumber}},
+    "amount": 1,
+    "entity_id":1
+}
+
+
+###
+# @name checkTransactionFromMPESA
+POST {{host}}/mpesa/check-online/ HTTP/1.1
+content-type: application/json
+
+{
+    "transaction_id" : 4
+}
+
+
+###
+# @name checkTransactionlocally
+POST {{host}}/mpesa/check-transaction/ HTTP/1.1
+content-type: application/json
+
+{
+    "transaction_id" : 4
+}
+
+
+
