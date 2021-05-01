@@ -5,45 +5,20 @@ import requests
 from requests.auth import HTTPBasicAuth
 from base64 import b64encode
 from .models import PaymentTransaction
-from cryptography import x509
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 
 # import env settings
-import importlib
+from decouple import config
 
-try:
-    dotenv = importlib.import_module('dotenv')
-    dotenv.load_dotenv(dotenv.find_dotenv())
-except ModuleNotFoundError:
-    pass
+consumer_key = config('CONSUMER_KEY')
+consumer_secret = config('CONSUMER_SECRET')
 
-consumer_key = os.environ.get('CONSUMER_KEY')
-consumer_secret = os.environ.get('CONSUMER_SECRET')
-api_URL = os.environ.get('API_URL')
-INITIATOR_PASS = os.environ.get('INITIATOR_PASS')
-CERTIFICATE_FILE = os.environ.get('CERTIFICATE_FILE')
-HOST_NAME = os.environ.get('HOST_NAME')
-PASS_KEY = os.environ.get('PASS_KEY')
-shortcode = os.environ.get('SHORT_CODE')
-SAFARICOM_API = os.environ.get('SAFARICOM_API')
+HOST_NAME = config('HOST_NAME')
+PASS_KEY = config('PASS_KEY')
+shortcode = config('SHORT_CODE')
+SAFARICOM_API = config('SAFARICOM_API')
 
-
-def encryptInitiatorPassword():
-    PASS = "foobar1234"
-    cert_file_path = os.path.join(os.path.dirname(__file__), CERTIFICATE_FILE)
-    cert_file = open(cert_file_path, 'rb')
-    cert_data = cert_file.read()
-    cert_file.close()
-
-    cert = x509.load_pem_x509_certificate(cert_data, default_backend())
-    PASS = str.encode(PASS)  # If you are using python 3
-    pub_key = cert.public_key()
-    cipher = pub_key.encrypt(PASS, padding=PKCS1v15())
-    return b64encode(cipher)
-
-
-def generate_pass_key(cipher):
+#Applies for LipaNaMpesaOnline Payment method
+def generate_pass_key():
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
     s = shortcode + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
@@ -57,24 +32,6 @@ def get_token():
     access_token = jonresponse['access_token']
     print(access_token)
     return access_token
-
-
-def register_url(access_token):
-    api_url = "{}/mpesa/c2b/v1/registerurl".format(SAFARICOM_API)
-    headers = {
-        "Authorization": "Bearer %s" % access_token,
-        "Content-Type": "application/json",
-    }
-    request = {
-        "ShortCode": "601754",
-        "ResponseType": "Cancelled",
-        "ConfirmationURL": HOST_NAME + reverse('mpesa-c2b-confirm'),
-        "ValidationURL": HOST_NAME + reverse('mpesa-c2b-validate')
-    }
-
-    response = requests.post(api_url, json=request, headers=headers)
-
-    print(response.text)
 
 
 def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
