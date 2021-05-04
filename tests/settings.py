@@ -20,11 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-from decouple import config
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = 'SECRET_KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG',default=False,cast=bool)
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -51,6 +50,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+MPESA_CONFIG = {
+    'CONSUMER_KEY': '',
+    'CONSUMER_SECRET': '',
+    'CERTIFICATE_FILE': None,
+    'HOST_NAME': '',
+    'PASS_KEY': '',
+    'SAFARICOM_API': 'https://sandbox.safaricom.co.ke',
+    'SHORT_CODE': '174379',
+}
 
 ROOT_URLCONF = 'tests.urls'
 

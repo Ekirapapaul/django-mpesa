@@ -1,23 +1,23 @@
 import os, socket, json, requests, datetime
 
-from django.urls import reverse
 import requests
 from requests.auth import HTTPBasicAuth
 from base64 import b64encode
 from .models import PaymentTransaction
+from .settings import api_settings
 
-# import env settings
-from decouple import config
+# Read variables from settings file
 
-consumer_key = config('CONSUMER_KEY')
-consumer_secret = config('CONSUMER_SECRET')
+consumer_key = api_settings.CONSUMER_KEY
+consumer_secret = api_settings.CONSUMER_SECRET
 
-HOST_NAME = config('HOST_NAME')
-PASS_KEY = config('PASS_KEY')
-shortcode = config('SHORT_CODE')
-SAFARICOM_API = config('SAFARICOM_API')
+HOST_NAME = api_settings.HOST_NAME
+PASS_KEY = api_settings.PASS_KEY
+shortcode = api_settings.SHORT_CODE
+SAFARICOM_API = api_settings.SAFARICOM_API
 
-#Applies for LipaNaMpesaOnline Payment method
+
+# Applies for LipaNaMpesaOnline Payment method
 def generate_pass_key():
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
     s = shortcode + PASS_KEY + time_now
@@ -30,7 +30,6 @@ def get_token():
     r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
     jonresponse = json.loads(r.content)
     access_token = jonresponse['access_token']
-    print(access_token)
     return access_token
 
 
@@ -46,7 +45,6 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
         "Authorization": "Bearer %s" % access_token,
         "Content-Type": "application/json",
     }
-    print("Phonenumber: {}, Amount: {}".format(phone_number, amount))
     request = {
         "BusinessShortCode": shortcode,
         "Password": encoded,
@@ -64,14 +62,14 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
     response = requests.post(api_url, json=request, headers=headers)
     json_response = json.loads(response.text)
     if json_response["ResponseCode"] == "0":
-        checkoutId = json_response["CheckoutRequestID"]
+        checkout_id = json_response["CheckoutRequestID"]
         if transaction_id:
             transaction = PaymentTransaction.objects.filter(id=transaction_id)
-            transaction.checkoutRequestID = checkoutId
+            transaction.checkoutRequestID = checkout_id
             transaction.save()
             return transaction.id
         else:
-            transaction = PaymentTransaction.objects.create(phone_number=phone_number, checkoutRequestID=checkoutId,
+            transaction = PaymentTransaction.objects.create(phone_number=phone_number, checkoutRequestID=checkout_id,
                                                             amount=amount, order_id=orderId)
             transaction.save()
             return transaction.id
