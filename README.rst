@@ -22,18 +22,34 @@ Quick start
         'mpesa',
     ]
 
-3. Include the polls URLconf in your project urls.py like this::
+3. Add Mpesa Config variables to your project's settings.py file 
+
+    MPESA_CONFIG = {
+        ...
+        'CONSUMER_KEY': '<Your consumer key from daraja>',
+        'CONSUMER_SECRET': '<Your consumer secret from daraja>',
+        'HOST_NAME': '<Your hostname e.g https://myhostname>',
+        'PASS_KEY': '<Your pass key from daraja>',
+        'SAFARICOM_API': 'https://sandbox.safaricom.co.ke',
+        'SHORT_CODE': '174379'
+
+    }
+
+
+    Check below for full setting variables description
+
+4. Include the polls URLconf in your project urls.py like this::
 
     from django.urls import path, include
     from mpesa.urls import mpesa_urls
 
     path('mpesa/', include(mpesa_urls)),
 
-4. Run `python manage.py migrate` to create the mpesa models.
+5. Run `python manage.py migrate` to create the mpesa models.
 
-5. Start the development server and visit http://127.0.0.1:8000/admin/
+6. Start the development server and visit http://127.0.0.1:8000/admin/
 
-6. Visit http://127.0.0.1:8000/mpesa/ to checkout the library features.
+7. Visit http://127.0.0.1:8000/mpesa/ to checkout the library features.
 
 API ENDPONTS
 ------------
