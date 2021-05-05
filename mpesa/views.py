@@ -5,7 +5,7 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import View
-from .functions import sendSTK, check_payment_status
+from .LipaNaMpesaOnline import sendSTK, check_payment_status
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -30,7 +30,10 @@ class SubmitView(APIView):
         data = request.data
         phone_number = data['phone_number']
         amount = data['amount']
-        entity_id = data['entity_id']
+
+        entity_id = 0
+        if data.get('entity_id'):
+            entity_id = data.get('entity_id')
 
         transactionId = sendSTK(phone_number, amount, entity_id)
         # b2c()
