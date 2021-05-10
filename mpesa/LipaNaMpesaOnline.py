@@ -13,14 +13,14 @@ consumer_secret = api_settings.CONSUMER_SECRET
 
 HOST_NAME = api_settings.HOST_NAME
 PASS_KEY = api_settings.PASS_KEY
-shortcode = api_settings.SHORT_CODE
+SHORT_CODE = api_settings.SHORT_CODE
 SAFARICOM_API = api_settings.SAFARICOM_API
 
 
 # Applies for LipaNaMpesaOnline Payment method
 def generate_pass_key():
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
-    s = shortcode + PASS_KEY + time_now
+    s = SHORT_CODE + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
 
@@ -33,11 +33,12 @@ def get_token():
     return access_token
 
 
-def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
+def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None):
+    SHORT_CODE = shortcode or SHORT_CODE
     access_token = get_token()
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
 
-    s = shortcode + PASS_KEY + time_now
+    s = SHORT_CODE + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
     api_url = "{}/mpesa/stkpush/v1/processrequest".format(SAFARICOM_API)
@@ -46,13 +47,13 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
         "Content-Type": "application/json",
     }
     request = {
-        "BusinessShortCode": shortcode,
+        "BusinessShortCode": SHORT_CODE,
         "Password": encoded,
         "Timestamp": time_now,
         "TransactionType": "CustomerPayBillOnline",
         "Amount": str(int(amount)),
         "PartyA": phone_number,
-        "PartyB": shortcode,
+        "PartyB": SHORT_CODE,
         "PhoneNumber": phone_number,
         "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
         "AccountReference": phone_number,
@@ -78,11 +79,12 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None):
         raise Exception("Error sending MPesa stk push", json_response)
 
 
-def check_payment_status(checkout_request_id):
+def check_payment_status(checkout_request_id, shortcode=None):
+    SHORT_CODE = shortcode or SHORT_CODE
     access_token = get_token()
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
 
-    s = shortcode + PASS_KEY + time_now
+    s = SHORT_CODE + PASS_KEY + time_now
     encoded = b64encode(s.encode('utf-8')).decode('utf-8')
 
     api_url = "{}/mpesa/stkpushquery/v1/query".format(SAFARICOM_API)
@@ -91,7 +93,7 @@ def check_payment_status(checkout_request_id):
         "Content-Type": "application/json",
     }
     request = {
-        "BusinessShortCode": shortcode,
+        "BusinessShortCode": SHORT_CODE,
         "Password": encoded,
         "Timestamp": time_now,
         "CheckoutRequestID": checkout_request_id
