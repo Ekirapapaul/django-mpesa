@@ -25,17 +25,25 @@ def generate_pass_key():
 
 
 def get_token():
-    api_URL = "{}/oauth/v1/generate?grant_type=client_credentials".format(SAFARICOM_API)
+    api_url = "{}/oauth/v1/generate?grant_type=client_credentials".format(SAFARICOM_API)
+    print(api_url)
 
-    r = requests.get(api_URL, auth=HTTPBasicAuth(consumer_key, consumer_secret))
-    jonresponse = json.loads(r.content)
-    access_token = jonresponse['access_token']
-    return access_token
+    r = requests.get(api_url, auth=HTTPBasicAuth(consumer_key, consumer_secret))
+    if r.status_code == 200:
+        jonresponse = json.loads(r.content)
+        access_token = jonresponse['access_token']
+        return access_token
+    elif r.status_code == 400:
+        print('Invalid credentials.')
+        return False
 
 
 def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None):
     code = shortcode or SHORT_CODE
     access_token = get_token()
+    if access_token is False:
+        raise Exception("Invalid Consumer key or secret or both")
+
     time_now = datetime.datetime.now().strftime("%Y%m%d%H%I%S")
 
     s = code + PASS_KEY + time_now
@@ -56,10 +64,11 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
         "PartyB": code,
         "PhoneNumber": phone_number,
         "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
-        "AccountReference": phone_number,
+        "AccountReference": code,
         "TransactionDesc": "Payment for {}".format(phone_number)
     }
 
+    print(request)
     response = requests.post(api_url, json=request, headers=headers)
     json_response = json.loads(response.text)
     if json_response.get('ResponseCode'):
@@ -71,8 +80,9 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
                 transaction.save()
                 return transaction.id
             else:
-                transaction = PaymentTransaction.objects.create(phone_number=phone_number, checkoutRequestID=checkout_id,
-                                                            amount=amount, order_id=orderId)
+                transaction = PaymentTransaction.objects.create(phone_number=phone_number,
+                                                                checkoutRequestID=checkout_id,
+                                                                amount=amount, order_id=orderId)
                 transaction.save()
                 return transaction.id
     else:
@@ -101,6 +111,14 @@ def check_payment_status(checkout_request_id, shortcode=None):
     response = requests.post(api_url, json=request, headers=headers)
     json_response = json.loads(response.text)
     if 'ResponseCode' in json_response and json_response["ResponseCode"] == "0":
+        requestId = json_response.get('CheckoutRequestID')
+        transaction = PaymentTransaction.objects.get(
+            checkoutRequestID=requestId)
+        if transaction:
+            transaction.isFinished = True
+            transaction.isSuccessFull = True
+            transaction.save()
+
         result_code = json_response['ResultCode']
         response_message = json_response['ResultDesc']
         return {
