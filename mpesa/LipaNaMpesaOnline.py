@@ -26,7 +26,6 @@ def generate_pass_key():
 
 def get_token():
     api_url = "{}/oauth/v1/generate?grant_type=client_credentials".format(SAFARICOM_API)
-    print(api_url)
 
     r = requests.get(api_url, auth=HTTPBasicAuth(consumer_key, consumer_secret))
     if r.status_code == 200:
@@ -38,7 +37,7 @@ def get_token():
         return False
 
 
-def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None):
+def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None, account_number=None):
     code = shortcode or SHORT_CODE
     access_token = get_token()
     if access_token is False:
@@ -54,18 +53,24 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
         "Authorization": "Bearer %s" % access_token,
         "Content-Type": "application/json",
     }
+
+    transaction_type = "CustomerBuyGoodsOnline"
+    # If account number is set, change transaction type to paybill
+    if account_number:
+        transaction_type = "CustomerPayBillOnline"
+
     request = {
         "BusinessShortCode": code,
         "Password": encoded,
         "Timestamp": time_now,
-        "TransactionType": "CustomerPayBillOnline",
+        "TransactionType": transaction_type,
         "Amount": str(int(amount)),
         "PartyA": phone_number,
         "PartyB": code,
         "PhoneNumber": phone_number,
         "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
-        "AccountReference": code,
-        "TransactionDesc": "Payment for {}".format(phone_number)
+        "AccountReference": account_number or code,
+        "TransactionDesc": "Payment for {} on account {}".format(phone_number, account_number or code)
     }
 
     print(request)

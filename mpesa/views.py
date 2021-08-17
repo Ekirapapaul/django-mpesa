@@ -35,9 +35,13 @@ class SubmitView(APIView):
         if data.get('entity_id'):
             entity_id = data.get('entity_id')
 
-        transactionId = sendSTK(phone_number, amount, entity_id)
+        paybill_account_number = None
+        if data.get('paybill_account_number'):
+            paybill_account_number = data.get('paybill_account_number')
+
+        transaction_id = sendSTK(phone_number, amount, entity_id, account_number=paybill_account_number)
         # b2c()
-        message = {"status": "ok", "transaction_id": transactionId}
+        message = {"status": "ok", "transaction_id": transaction_id}
         return Response(message, status=HTTP_200_OK)
 
 
