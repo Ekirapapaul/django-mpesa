@@ -15,6 +15,7 @@ HOST_NAME = api_settings.HOST_NAME
 PASS_KEY = api_settings.PASS_KEY
 SHORT_CODE = api_settings.SHORT_CODE
 SAFARICOM_API = api_settings.SAFARICOM_API
+TRANSACTION_TYPE = api_settings.TRANSACTION_TYPE
 
 
 # Applies for LipaNaMpesaOnline Payment method
@@ -54,10 +55,12 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
         "Content-Type": "application/json",
     }
 
-    transaction_type = "CustomerBuyGoodsOnline"
+    transaction_type = TRANSACTION_TYPE or "CustomerBuyGoodsOnline"
     # If account number is set, change transaction type to paybill
     if account_number:
         transaction_type = "CustomerPayBillOnline"
+    elif transaction_type == "CustomerPayBillOnline" and account_number == None:
+        account_number = phone_number
 
     request = {
         "BusinessShortCode": code,
@@ -70,7 +73,7 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
         "PhoneNumber": phone_number,
         "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
         "AccountReference": account_number or code,
-        "TransactionDesc": "Payment for {} on account {}".format(phone_number, account_number or code)
+        "TransactionDesc": "{}".format(phone_number)
     }
 
     print(request)

@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 import uuid
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 
 # Create your models here.
@@ -21,7 +23,7 @@ class BaseModel(models.Model):
 
 class PaymentTransaction(models.Model):
     phone_number = models.CharField(max_length=30)
-    amount = models.DecimalField(('amount'), max_digits=6, decimal_places=2, default=0)
+    amount = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     isFinished = models.BooleanField(default=False)
     isSuccessFull = models.BooleanField(default=False)
     trans_id = models.CharField(max_length=30)
@@ -29,6 +31,10 @@ class PaymentTransaction(models.Model):
     checkoutRequestID = models.CharField(max_length=100)
     date_modified = models.DateTimeField(auto_now=True)
     date_created = models.DateTimeField(auto_now=False, auto_now_add=True)
+
+    content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.SET_NULL)
+    object_id = models.PositiveIntegerField(default=0)
+    order_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return "{} {}".format(self.phone_number, self.amount)

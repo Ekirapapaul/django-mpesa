@@ -11,6 +11,7 @@ DEFAULTS = {
     'PASS_KEY': None,
     'SAFARICOM_API': 'https://sandbox.safaricom.co.ke',
     'SHORT_CODE': None,
+    'TRANSACTION_TYPE': 'CustomerBuyGoodsOnline',
 }
 
 api_settings = APISettings(USER_SETTINGS, DEFAULTS, None)
