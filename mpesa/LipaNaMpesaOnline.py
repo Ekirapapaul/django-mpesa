@@ -15,6 +15,7 @@ HOST_NAME = api_settings.HOST_NAME
 PASS_KEY = api_settings.PASS_KEY
 SHORT_CODE = api_settings.SHORT_CODE
 SAFARICOM_API = api_settings.SAFARICOM_API
+TRANSACTION_TYPE = api_settings.TRANSACTION_TYPE
 
 
 # Applies for LipaNaMpesaOnline Payment method
@@ -26,7 +27,6 @@ def generate_pass_key():
 
 def get_token():
     api_url = "{}/oauth/v1/generate?grant_type=client_credentials".format(SAFARICOM_API)
-    print(api_url)
 
     r = requests.get(api_url, auth=HTTPBasicAuth(consumer_key, consumer_secret))
     if r.status_code == 200:
@@ -38,7 +38,7 @@ def get_token():
         return False
 
 
-def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None):
+def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None, account_number=None):
     code = shortcode or SHORT_CODE
     access_token = get_token()
     if access_token is False:
@@ -54,18 +54,26 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
         "Authorization": "Bearer %s" % access_token,
         "Content-Type": "application/json",
     }
+
+    transaction_type = TRANSACTION_TYPE or "CustomerBuyGoodsOnline"
+    # If account number is set, change transaction type to paybill
+    if account_number:
+        transaction_type = "CustomerPayBillOnline"
+    elif transaction_type == "CustomerPayBillOnline" and account_number == None:
+        account_number = phone_number
+
     request = {
         "BusinessShortCode": code,
         "Password": encoded,
         "Timestamp": time_now,
-        "TransactionType": "CustomerPayBillOnline",
+        "TransactionType": transaction_type,
         "Amount": str(int(amount)),
         "PartyA": phone_number,
         "PartyB": code,
         "PhoneNumber": phone_number,
         "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
-        "AccountReference": code,
-        "TransactionDesc": "Payment for {}".format(phone_number)
+        "AccountReference": account_number or code,
+        "TransactionDesc": "{}".format(phone_number)
     }
 
     print(request)

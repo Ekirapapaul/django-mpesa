@@ -59,6 +59,7 @@ MPESA_CONFIG = {
     'PASS_KEY': '',
     'SAFARICOM_API': 'https://sandbox.safaricom.co.ke',
     'SHORT_CODE': '174379',
+    'TRANSACTION_TYPE': 'CustomerBuyGoodsOnline',
 }
 
 ROOT_URLCONF = 'tests.urls'
