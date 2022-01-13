@@ -52,13 +52,14 @@ MIDDLEWARE = [
 ]
 
 MPESA_CONFIG = {
-    'CONSUMER_KEY': 'xKfIPt144qAp2SkK9p0Q4g1b5QVpLRAN',
-    'CONSUMER_SECRET': '2CNJGtUoeqN8n3Rr',
+    'CONSUMER_KEY': '',
+    'CONSUMER_SECRET': '',
     'CERTIFICATE_FILE': None,
-    'HOST_NAME': 'https://f579c00c6b8e.ngrok.io',
-    'PASS_KEY': 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    'HOST_NAME': '',
+    'PASS_KEY': '',
     'SAFARICOM_API': 'https://sandbox.safaricom.co.ke',
     'SHORT_CODE': '174379',
+    'TRANSACTION_TYPE': 'CustomerBuyGoodsOnline',
 }
 
 ROOT_URLCONF = 'tests.urls'
