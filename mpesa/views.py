@@ -52,8 +52,8 @@ class CheckTransactionOnline(APIView):
         trans_id = request.data['transaction_id']
         transaction = PaymentTransaction.objects.filter(id=trans_id).get()
         try:
-            if transaction.checkoutRequestID:
-                status_response = check_payment_status(transaction.checkoutRequestID)
+            if transaction.checkout_request_id:
+                status_response = check_payment_status(transaction.checkout_request_id)
                 return JsonResponse(
                     status_response, status=200)
             else:
@@ -80,8 +80,8 @@ class CheckTransaction(APIView):
             if transaction:
                 return JsonResponse({
                     "message": "ok",
-                    "finished": transaction.isFinished,
-                    "successful": transaction.isSuccessFull
+                    "finished": transaction.is_finished,
+                    "successful": transaction.is_successful
                 },
                     status=200)
             else:
@@ -106,11 +106,11 @@ class RetryTransaction(APIView):
         trans_id = request.data['transaction_id']
         try:
             transaction = PaymentTransaction.objects.filter(id=trans_id).get()
-            if transaction and transaction.isSuccessFull:
+            if transaction and transaction.is_successful:
                 return JsonResponse({
                     "message": "ok",
-                    "finished": transaction.isFinished,
-                    "successful": transaction.isSuccessFull
+                    "finished": transaction.is_finished,
+                    "successful": transaction.is_successful
                 },
                     status=200)
             else:
@@ -154,8 +154,8 @@ class ConfirmView(APIView):
                 checkoutRequestID=requestId)
             if transaction:
                 transaction.trans_id = receipt_number
-                transaction.isFinished = True
-                transaction.isSuccessFull = True
+                transaction.is_finished = True
+                transaction.is_successful = True
                 transaction.save()
 
         else:
@@ -164,8 +164,8 @@ class ConfirmView(APIView):
             transaction = PaymentTransaction.objects.get(
                 checkoutRequestID=requestId)
             if transaction:
-                transaction.isFinished = True
-                transaction.isSuccessFull = False
+                transaction.is_finished = True
+                transaction.is_successful = False
                 transaction.save()
 
         # Prepare the response, assuming no errors have occurred. Any response

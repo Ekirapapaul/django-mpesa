@@ -84,7 +84,7 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
             checkout_id = json_response["CheckoutRequestID"]
             if transaction_id:
                 transaction = PaymentTransaction.objects.filter(id=transaction_id)
-                transaction.checkoutRequestID = checkout_id
+                transaction.checkout_request_id = checkout_id
                 transaction.save()
                 return transaction.id
             else:
@@ -123,8 +123,8 @@ def check_payment_status(checkout_request_id, shortcode=None):
         transaction = PaymentTransaction.objects.get(
             checkoutRequestID=requestId)
         if transaction:
-            transaction.isFinished = True
-            transaction.isSuccessFull = True
+            transaction.is_finished = True
+            transaction.is_successful = True
             transaction.save()
 
         result_code = json_response['ResultCode']
@@ -132,7 +132,9 @@ def check_payment_status(checkout_request_id, shortcode=None):
         return {
             "result_code": result_code,
             "status": result_code == "0",
+            "finished": transaction.is_finished,
+            "successful": transaction.is_successful,
             "message": response_message
         }
     else:
-        raise Exception("Error sending MPesa stk push", json_response)
+        raise Exception("Error checking transaction status", json_response)
