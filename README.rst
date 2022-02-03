@@ -15,9 +15,7 @@ Quick start
 
     pip install django-mpesa
     
-2. Add "mpesa" to your INSTALLED_APPS setting like this:
-
-.. code-block:: python
+2. Add "mpesa" to your INSTALLED_APPS setting like this::
 
     INSTALLED_APPS = [
         ...
@@ -26,9 +24,8 @@ Quick start
 
 3. Add Mpesa Config variables to your project's settings.py file 
 
-.. code-block:: python
-
     MPESA_CONFIG = {
+        ...
         'CONSUMER_KEY': '<Your consumer key from daraja>',
         'CONSUMER_SECRET': '<Your consumer secret from daraja>',
         'HOST_NAME': '<Your hostname e.g https://myhostname>',
@@ -37,11 +34,11 @@ Quick start
         'SHORT_CODE': '174379'
 
     }
-    # Check below for full setting variables description
+
+
+    Check below for full setting variables description
 
 4. Include the polls URLconf in your project urls.py like this::
-
-.. code-block:: python
 
     from django.urls import path, include
     from mpesa.urls import mpesa_urls
