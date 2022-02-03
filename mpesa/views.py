@@ -151,7 +151,7 @@ class ConfirmView(APIView):
                 if data.get('Name') == "MpesaReceiptNumber":
                     receipt_number = data.get('Value')
             transaction = PaymentTransaction.objects.get(
-                checkoutRequestID=requestId)
+                checkout_request_id=requestId)
             if transaction:
                 transaction.trans_id = receipt_number
                 transaction.is_finished = True
@@ -162,7 +162,7 @@ class ConfirmView(APIView):
             print('unsuccessfull')
             requestId = body.get('stkCallback').get('CheckoutRequestID')
             transaction = PaymentTransaction.objects.get(
-                checkoutRequestID=requestId)
+                checkout_request_id=requestId)
             if transaction:
                 transaction.is_finished = True
                 transaction.is_successful = False
