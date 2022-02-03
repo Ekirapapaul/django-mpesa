@@ -89,7 +89,7 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
                 return transaction.id
             else:
                 transaction = PaymentTransaction.objects.create(phone_number=phone_number,
-                                                                checkoutRequestID=checkout_id,
+                                                                checkout_request_id=checkout_id,
                                                                 amount=amount, order_id=orderId)
                 transaction.save()
                 return transaction.id
@@ -121,7 +121,7 @@ def check_payment_status(checkout_request_id, shortcode=None):
     if 'ResponseCode' in json_response and json_response["ResponseCode"] == "0":
         requestId = json_response.get('CheckoutRequestID')
         transaction = PaymentTransaction.objects.get(
-            checkoutRequestID=requestId)
+            checkout_request_id=requestId)
         if transaction:
             transaction.is_finished = True
             transaction.is_successful = True
