@@ -10,6 +10,7 @@ DEFAULTS = {
     'HOST_NAME': None,
     'PASS_KEY': None,
     'SAFARICOM_API': 'https://sandbox.safaricom.co.ke',
+    'AUTH_URL': '/oauth/v1/generate?grant_type=client_credentials',
     'SHORT_CODE': None,
     'TRANSACTION_TYPE': 'CustomerBuyGoodsOnline',
 }
