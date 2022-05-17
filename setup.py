@@ -22,7 +22,7 @@ extras_require['dev'] = (
 
 setup(
     name='django-mpesa',
-    version='2.0.12',
+    version='2.0.13',
     description='A python library that interfaces safaricoms mpesa apis',
     long_description=open('README.rst', 'r', encoding='utf-8').read(),
     url='https://www.vorane.com/',
