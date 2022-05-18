@@ -14,6 +14,7 @@ consumer_secret = api_settings.CONSUMER_SECRET
 HOST_NAME = api_settings.HOST_NAME
 PASS_KEY = api_settings.PASS_KEY
 SHORT_CODE = api_settings.SHORT_CODE
+TILL_NUMBER = api_settings.TILL_NUMBER
 SAFARICOM_API = api_settings.SAFARICOM_API
 TRANSACTION_TYPE = api_settings.TRANSACTION_TYPE
 AUTH_URL = api_settings.AUTH_URL
@@ -41,6 +42,7 @@ def get_token():
 
 def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None, account_number=None):
     code = shortcode or SHORT_CODE
+    party_b = TILL_NUMBER or code
     access_token = get_token()
     if access_token is False:
         raise Exception("Invalid Consumer key or secret or both")
@@ -70,7 +72,7 @@ def sendSTK(phone_number, amount, orderId=0, transaction_id=None, shortcode=None
         "TransactionType": transaction_type,
         "Amount": str(int(amount)),
         "PartyA": phone_number,
-        "PartyB": int(code),
+        "PartyB": party_b,
         "PhoneNumber": phone_number,
         "CallBackURL": "{}/mpesa/confirm/".format(HOST_NAME),
         "AccountReference": account_number or code,
